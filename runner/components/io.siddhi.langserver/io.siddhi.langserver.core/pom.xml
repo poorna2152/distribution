@@ -52,9 +52,25 @@
             <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.streaming.integrator.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.event.simulator.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi.distribution</groupId>
+            <artifactId>io.siddhi.distribution.core</artifactId>
         </dependency>
     </dependencies>
     <build>

@@ -19,9 +19,13 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
+import  com.google.gson.JsonParser;
 import java.util.concurrent.Future;
 
 /**
@@ -40,6 +44,11 @@ public class StdioLauncher {
         // To avoid logs printed to I/O which breaks LS protocol.
         //Logger.getRootLogger().setLevel(Level.OFF);
         //System's standard input and output is used as the transport for server client communication.
+        try (PrintWriter out = new PrintWriter("gson-source-log.txt", StandardCharsets.UTF_8)) {
+            out.println("Loaded JsonParser from: " + JsonParser.class.getProtectionDomain().getCodeSource().getLocation());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         startServer(System.in, System.out);
     }
 

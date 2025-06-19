@@ -106,8 +106,7 @@ public class SiddhiTextDocumentService implements TextDocumentService {
      * @param didChangeTextDocumentParams
      */
     @Override
-    public void didChange(DidChangeTextDocumentParams didChangeTextDocumentParams) {
-        String documentUri = didChangeTextDocumentParams.getTextDocument().getUri();
+    public void didChange(DidChangeTextDocumentParams didChangeTextDocumentParams) {String documentUri = didChangeTextDocumentParams.getTextDocument().getUri();
         try {
             List<TextDocumentContentChangeEvent> changes = didChangeTextDocumentParams.getContentChanges();
             for (TextDocumentContentChangeEvent changeEvent : changes) {

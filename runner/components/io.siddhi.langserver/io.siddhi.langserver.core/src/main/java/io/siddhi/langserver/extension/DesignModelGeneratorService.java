@@ -4,13 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.exception.SiddhiAppCreationException;
+import io.siddhi.langserver.request.Base64String;
 import io.siddhi.langserver.response.DesignModelResponse;
-import org.eclipse.lsp4j.jsonrpc.json.JsonRpcMethod;
-import org.eclipse.lsp4j.jsonrpc.json.JsonRpcMethodProvider;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
-import org.eclipse.lsp4j.jsonrpc.services.ServiceEndpoints;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
+import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
+import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
+import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
+import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.DeserializersRegisterer;
@@ -20,51 +22,45 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGener
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class DesignModelGeneratorService implements JsonRpcMethodProvider {
+@JsonSegment("flowDesignService")
+public class DesignModelGeneratorService extends ExtensionService {
 
-    private static final Logger log = LoggerFactory.getLogger(DesignModelGeneratorService.class);
-
-    @Override
-    public Map<String, JsonRpcMethod> supportedMethods() {
-        return new HashMap<>(ServiceEndpoints.getSupportedMethods(getClass()));
-    }
 
     @JsonRequest
-    public CompletableFuture<DesignModelResponse> getDesignView(String siddhiAppBase64) {
+    public CompletableFuture<DesignModelResponse> getDesignView(Base64String siddhiAppBase64) {
         return CompletableFuture.supplyAsync(() -> {
             DesignModelResponse designModelResponse = new DesignModelResponse();
             try {
                 SiddhiManager siddhiManager = new SiddhiManager();
                 DesignGenerator designGenerator = new DesignGenerator();
                 designGenerator.setSiddhiManager(siddhiManager);
-                String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
+                String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64.getValue()), StandardCharsets.UTF_8);
                 EventFlow eventFlow = designGenerator.getEventFlow(siddhiAppString);
                 Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
                 String eventFlowJson = gson.toJson(eventFlow);
-                designModelResponse.setContent(new String(Base64.getEncoder().encode(eventFlowJson.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                byte[] encodedBytes = Base64.getEncoder().encode(eventFlowJson.getBytes(StandardCharsets.UTF_8));
+                String encodedString = new String(encodedBytes, StandardCharsets.UTF_8);
+                designModelResponse.setContent(encodedString);
                 return designModelResponse;
             } catch (SiddhiAppCreationException e) {
                 designModelResponse.setError(e);
-                log.error("Unable to generate design view", e);
             } catch (DesignGenerationException e) {
                 designModelResponse.setError(e);
-                log.error("Failed to convert Siddhi app code to design view", e);
             }
             return designModelResponse;
         });
     }
 
     @JsonRequest
-    public CompletableFuture<DesignModelResponse> getSourceCode(String encodedEventFlowJson) {
+    public CompletableFuture<DesignModelResponse> getSourceCode(Base64String encodedEventFlowJson) {
         return CompletableFuture.supplyAsync(() -> {
             DesignModelResponse designModelResponse = new DesignModelResponse();
             try {
                 String eventFlowJson =
-                        new String(Base64.getDecoder().decode(encodedEventFlowJson), StandardCharsets.UTF_8);
+                        new String(Base64.getDecoder().decode(encodedEventFlowJson.getValue()), StandardCharsets.UTF_8);
                 Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
                 EventFlow eventFlow = gson.fromJson(eventFlowJson, EventFlow.class);
                 CodeGenerator codeGenerator = new CodeGenerator();
@@ -75,9 +71,23 @@ public class DesignModelGeneratorService implements JsonRpcMethodProvider {
                                 StandardCharsets.UTF_8);
                 designModelResponse.setContent(encodedSiddhiAppString);
             } catch (CodeGenerationException e) {
-                log.error("Unable to generate code view", e);
                 designModelResponse.setError(e);
             }
+            return designModelResponse;
+        });
+    }
+
+    @JsonRequest
+    public CompletableFuture<DesignModelResponse> getMetaData() {
+        return CompletableFuture.supplyAsync(() -> {
+            DesignModelResponse designModelResponse = new DesignModelResponse();
+            EditorDataHolder.setSiddhiManager(new SiddhiManager());
+            MetaDataResponse response = new MetaDataResponse(Status.SUCCESS);
+            Map<String, MetaData> extensions = SourceEditorUtils.getExtensionProcessorMetaData();
+            response.setInBuilt(extensions.remove(""));
+            response.setExtensions(extensions);
+            String jsonString = new Gson().toJson(response);
+            designModelResponse.setContent(jsonString);
             return designModelResponse;
         });
     }

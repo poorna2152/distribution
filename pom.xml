@@ -1372,6 +1372,16 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
+                <version>${carbon.analytics.editor.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.streaming.integrator.core</artifactId>
+                <version>${carbon.analytics.editor.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.event.simulator.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
 
@@ -1381,6 +1391,7 @@
     <properties>
         <siddhi.version>5.1.31</siddhi.version>
         <carbon.analytics.version>3.0.75</carbon.analytics.version>
+        <carbon.analytics.editor.version>3.0.76-SNAPSHOT</carbon.analytics.editor.version>
         <siddhi.bundle.version>5.1.31</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.40</carbon.analytics-common.version>
@@ -1428,7 +1439,7 @@
         <geronimo.activation>1.1</geronimo.activation>
         <geronimo.stax>1.0.1</geronimo.stax>
         <mime4j.version>0.8.3</mime4j.version>
-        <gson.version>2.8.6</gson.version>
+        <gson.version>2.9.1</gson.version>
         <commons-lang3.version>3.9</commons-lang3.version>
         <kafka-2.11.version>0.10.0.0</kafka-2.11.version>
         <httpclient.version>4.3.6.wso2v2</httpclient.version>
@@ -1443,7 +1454,7 @@
         <findbugs.version>1.0.0</findbugs.version>
 
         <!-- json dependencies -->
-        <gson.version>2.8.5</gson.version>
+        <gson.version>2.9.1</gson.version>
         <jayway.jsonpath.version>2.2.0</jayway.jsonpath.version>
         <tapestry.json.orbit.version>5.4.1.wso2v1</tapestry.json.orbit.version>
 
@@ -1603,7 +1614,7 @@
         <opencensus.version>0.21.0</opencensus.version>
 
         <!-- language server dependency version -->
-        <lsp4j.version>0.8.1</lsp4j.version>
+        <lsp4j.version>0.24.0</lsp4j.version>
         <antlr4-runtime.version>4.11.1</antlr4-runtime.version>
 
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>

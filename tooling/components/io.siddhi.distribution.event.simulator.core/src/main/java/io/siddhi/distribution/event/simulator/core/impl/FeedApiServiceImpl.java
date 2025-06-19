@@ -367,7 +367,7 @@ public class FeedApiServiceImpl extends FeedApiService {
         ActiveSimulatorData activeSimulatorData = EventSimulatorMap.getInstance().getActiveSimulatorMap()
                 .get(simulationName);
         if (activeSimulatorData != null) {
-            EventSimulator eventSimulator = activeSimulatorData.getEventSimulator();
+            EventSimulator eventSimulator = activeSimulatorData.getEventgit Simulator();
             switch (eventSimulator.getStatus()) {
                 case STOP:
                     executorServices.execute(eventSimulator);

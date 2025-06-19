@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>io.siddhi.distribution</groupId>
+        <artifactId>io.siddhi.langserver.parent</artifactId>
+        <version>5.1.3-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>io.siddhi.langserver.runner</artifactId>
+    <name>Siddhi Distribution Language Server - Runner</name>
+    <dependencies>
+        <dependency>
+            <groupId>io.siddhi.distribution</groupId>
+            <artifactId>io.siddhi.distribution.event.simulator.core</artifactId>
+            <version>5.1.3-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+    <modelVersion>4.0.0</modelVersion>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>Runner</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
