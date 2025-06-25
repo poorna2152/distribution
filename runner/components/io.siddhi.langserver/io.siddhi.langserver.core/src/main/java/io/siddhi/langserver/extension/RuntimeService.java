@@ -7,9 +7,12 @@ import io.siddhi.langserver.request.StartAppRequest;
 import io.siddhi.langserver.response.DeployAppResponse;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
+import org.wso2.carbon.analytics.idp.client.core.internal.AnalyticsHttpClientBuilderServiceImpl;
 import org.wso2.carbon.siddhi.editor.core.commons.response.DebugRuntimeResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
+import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
 
 import java.io.IOException;
@@ -48,6 +51,7 @@ public class RuntimeService extends ExtensionService {
             for (DeployAppRequest.SiddhiFile siddhiApp: deployAppRequest.getSiddhiFileList()) {
                 fileName = siddhiApp.getFileName().replaceAll("\"", "");
                 try {
+                    EditorDataHolder.getInstance().setClientBuilderService(new AnalyticsHttpClientBuilderServiceImpl());
                     siddhiFile = Files.readString(Paths.get(siddhiApp.getFilePath()));
                 } catch (IOException e) {
                     success = false;

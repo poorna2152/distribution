@@ -6,7 +6,7 @@ import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.query.api.definition.Attribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.siddhi.distribution.common.common.EventStreamService;
+import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 
 import java.util.ArrayList;
 import java.util.Collections;

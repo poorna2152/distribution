@@ -15,6 +15,8 @@ import org.wso2.carbon.siddhi.editor.core.exception.KubernetesGenerationExceptio
 import org.wso2.carbon.siddhi.editor.core.internal.DockerBuilder;
 import org.wso2.carbon.siddhi.editor.core.internal.DockerBuilderStatus;
 import org.wso2.carbon.siddhi.editor.core.internal.ExportUtils;
+import org.wso2.carbon.siddhi.editor.core.vscode.PublicExportUtils;
+import org.wso2.carbon.utils.Utils;
 
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +38,8 @@ public class ExportService extends ExtensionService {
         return CompletableFuture.supplyAsync(() -> {
             String errorMessage = "";
             try {
-                ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, EXPORT_TYPE_DOCKER);
+                ExportUtils exportUtils = PublicExportUtils.getExportUtils(configProvider, exportAppsRequest, EXPORT_TYPE_DOCKER);
+                System.setProperty("user.dir", Utils.getRuntimePath().toString());
                 exportUtils.createZipFile();
 
                 boolean pushDocker = exportAppsRequest.getDockerConfiguration().isPushDocker();
@@ -45,7 +48,7 @@ public class ExportService extends ExtensionService {
                 }
 
                 DockerBuildConfig dockerBuildConfig = exportAppsRequest.getDockerConfiguration();
-                DockerBuilderStatus dockerBuilderStatus = new DockerBuilderStatus("", "");
+                DockerBuilderStatus dockerBuilderStatus = PublicExportUtils.getDockerBuilderStatusInstance("", "" );
                 if ((StringUtils.isEmpty(dockerBuildConfig.getImageName())) ||
                         (StringUtils.isEmpty(dockerBuildConfig.getUserName())) ||
                         (StringUtils.isEmpty(dockerBuildConfig.getEmail())) ||
