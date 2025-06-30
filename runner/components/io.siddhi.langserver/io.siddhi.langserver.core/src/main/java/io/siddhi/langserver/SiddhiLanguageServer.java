@@ -38,6 +38,7 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
+import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.siddhi.editor.core.internal.DebugProcessorService;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
@@ -69,33 +70,15 @@ public class SiddhiLanguageServer implements LanguageServer, Endpoint, JsonRpcMe
     private final Map<String, Endpoint> extensionServices = new HashMap<>();
 
     public SiddhiLanguageServer() {
-////            LoggerContext context = LogManager.getContext(false);
-////            Configuration config = context.getConfiguration();
-////            out.println("Loaded config location: " + config.getConfigurationSource().getLocation());
-////            LoggerContext context = (LoggerContext) LogManager.getContext(false);
-////            out.println("Config file loaded from: " + context.getConfiguration().getConfigurationSource().getLocation());
-////            Logger nettyLogger = LogManager.getLogger("io.netty");
-////            out.println("Netty logger level: " + ((org.apache.logging.log4j.core.Logger)nettyLogger).getLevel());
-////            System.setProperty("log4j2.statusLoggerLevel", "OFF");
-////            System.setProperty("log4j2.debug", "false");            // Disable debug mode
-//            Configurator.setLevel("io.netty", Level.OFF);
-////            Configurator.setRootLevel(Level.ERROR);
-//        } catch (Exception e) {
-//            // Fallback
-////            System.setProperty("log4j2.level", "ERROR");
-//            System.setProperty("io.netty.logging.level", "OFF");
-//        }
-
-//        ConfigurationSource configurationSource = ctx.getConfiguration().getConfigurationSource();
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        ConfigurationSource configurationSource = ctx.getConfiguration().getConfigurationSource();
         LSOperationContext.INSTANCE.setSiddhiLanguageServer(this);
+        EditorDataHolder.setSiddhiManager(LSOperationContext.INSTANCE.getSiddhiManager());
         this.textDocumentService = new SiddhiTextDocumentService();
         this.workspaceService = new SiddhiWorkspaceService();
         this.designModelGeneratorService = new DesignModelGeneratorService();
         this.eventSimulatorService = new EventSimulatorService();
         this.runtimeService = new RuntimeService();
         this.exportService = new ExportService();
+
     }
 
     /**

@@ -15,8 +15,12 @@
  */
 package io.siddhi.langserver;
 
+import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.langserver.diagnostic.DiagnosticProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A local context for language server operation.
@@ -24,9 +28,10 @@ import io.siddhi.langserver.diagnostic.DiagnosticProvider;
 public class LSOperationContext {
 
     private SiddhiLanguageServer siddhiLanguageServer = null;
-    private SiddhiManager siddhiManager;
-    private DiagnosticProvider diagnosticProvider;
+    private final SiddhiManager siddhiManager;
+    private final DiagnosticProvider diagnosticProvider;
     public static final LSOperationContext INSTANCE = new LSOperationContext();
+    private final Map<String, SiddhiAppRuntime> siddhiAppRuntimeMap = new HashMap<>();
 
     private LSOperationContext() {
         this.diagnosticProvider = DiagnosticProvider.getInstance();
@@ -43,6 +48,18 @@ public class LSOperationContext {
 
     public SiddhiManager getSiddhiManager() {
         return this.siddhiManager;
+    }
+
+    public SiddhiAppRuntime getSiddhiAppRuntime(String siddhiAppName) {
+        return this.siddhiAppRuntimeMap.get(siddhiAppName);
+    }
+
+    public void addSiddhiAppRuntime(String siddhiAppName, SiddhiAppRuntime siddhiAppRuntime) {
+        siddhiAppRuntimeMap.put(siddhiAppName, siddhiAppRuntime);
+    }
+
+    public boolean checkIfSiddhiAppRuntimeExists(String siddhiAppName) {
+        return siddhiAppRuntimeMap.containsKey(siddhiAppName);
     }
 
     public DiagnosticProvider getDiagnosticProvider() {

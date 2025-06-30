@@ -1,11 +1,11 @@
 package io.siddhi.langserver.response;
 
 public class SimulatorResponse {
-    private String errorMessage;
+    private String message;
     private boolean success;
 
-    public SimulatorResponse(boolean success, String errorMessage) {
-        this.errorMessage = errorMessage;
+    public SimulatorResponse(boolean success, String  message) {
+        this.message = message;
         this.success = success;
     }
 }

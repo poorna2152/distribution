@@ -15,6 +15,7 @@
  */
 package io.siddhi.langserver.diagnostic;
 
+import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.langserver.LSOperationContext;
 import io.siddhi.query.api.exception.SiddhiAppContextException;
@@ -26,6 +27,7 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.services.LanguageClient;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +53,10 @@ public class DiagnosticProvider {
      */
     public void compileAndSendDiagnostics(LanguageClient client, String fileUri, String sourceContent) {
         try {
-            LSOperationContext.INSTANCE.getSiddhiManager().createSiddhiAppRuntime(sourceContent);
+            LSOperationContext lsOperationContext = LSOperationContext.INSTANCE;
+            SiddhiAppRuntime siddhiAppRuntime = lsOperationContext.getSiddhiManager().createSiddhiAppRuntime(sourceContent);
+            String fileName = Paths.get(fileUri).getFileName().toString();
+            lsOperationContext.addSiddhiAppRuntime(fileName, siddhiAppRuntime);
             List<Diagnostic> diagnostics = new ArrayList<>();
             client.publishDiagnostics(new PublishDiagnosticsParams(fileUri, diagnostics));
         } catch (SiddhiAppCreationException | SiddhiParserException exception) {

@@ -1,12 +1,14 @@
 package io.siddhi.langserver.request;
 
-public class GetStreamAttributeRequest {
+public class StreamAttributeGetRequest {
     private String siddhiAppString;
     private String streamName;
+    private String siddhiAppUri;
 
-    public GetStreamAttributeRequest(String siddhiAppString, String streamName) {
+    public StreamAttributeGetRequest(String siddhiAppString, String streamName, String siddhiAppUri) {
         this.siddhiAppString = siddhiAppString;
         this.streamName = streamName;
+        this.siddhiAppUri = siddhiAppUri;
     }
 
     public String getSiddhiAppString() {
@@ -15,5 +17,9 @@ public class GetStreamAttributeRequest {
 
     public String getStreamName() {
         return streamName;
+    }
+
+    public String getSiddhiAppUri() {
+        return siddhiAppUri;
     }
 }
