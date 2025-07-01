@@ -21,38 +21,34 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class LSEventSimulatorDataHolder {
+    private static final String JSON_EXTENSION = ".json";
     private static final long DEFAULT_MAX_FILE_SIZE = 8388608L; // 8MB
     private final String DEPLOYMENT_DIR = Paths.get(Utils.getRuntimePath().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT).toString();
+    private final Path SIMULATION_CONFIG_DIR = Paths.get(DEPLOYMENT_DIR, EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS);
 
     private final Map<String, List<String>> siddhiAppSimulationConfigs;
-    private final Set<String> simulationActivatedSiddhiApps;
+    private final Set<String> activatedSimulationConfigs;
     private final CSVFileDeployer csvFileDeployer;
     private final SimulationConfigDeployer simulationConfigDeployer;
     public static final LSEventSimulatorDataHolder INSTANCE = new LSEventSimulatorDataHolder();
 
     public LSEventSimulatorDataHolder() {
         this.siddhiAppSimulationConfigs = new HashMap<>();
-        this.simulationActivatedSiddhiApps = new HashSet<>();
+        this.activatedSimulationConfigs = new HashSet<>();
         this.simulationConfigDeployer = new SimulationConfigDeployer();
         this.csvFileDeployer = new CSVFileDeployer();
     }
 
-    public void initialize(EventStreamService eventStreamService) throws CarbonDeploymentException, IOException {
-        initializeEventSimulatorDataHolder(eventStreamService);
-        loadSimulationConfigurations();
-    }
-
-    private void initializeEventSimulatorDataHolder(EventStreamService eventStreamService) {
+    public void initializeEventSimulatorDataHolder(EventStreamService eventStreamService) {
         EventSimulatorDataHolder dataHolder = EventSimulatorDataHolder.getInstance();
         dataHolder.setEventStreamService(eventStreamService);
         dataHolder.setMaximumFileSize(DEFAULT_MAX_FILE_SIZE);
         dataHolder.setCsvFileDirectory(Paths.get(DEPLOYMENT_DIR, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
     }
 
-    private void loadSimulationConfigurations() throws IOException {
-        Path configDirectory = getSimulationConfigDirectory();
-        File folder = configDirectory.toFile();
-        File[] jsonFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
+    public void loadSimulationConfigurations() throws IOException {
+        File folder = SIMULATION_CONFIG_DIR.toFile();
+        File[] jsonFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(JSON_EXTENSION));
 
         if (jsonFiles == null) {
             return;
@@ -63,8 +59,44 @@ public class LSEventSimulatorDataHolder {
         }
     }
 
-    private Path getSimulationConfigDirectory() {
-        return Paths.get(DEPLOYMENT_DIR, EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS);
+    public static String getSiddhiAppName(JSONArray sourcesArray) {
+        JSONObject sourceObject = sourcesArray.getJSONObject(0);
+        return sourceObject.getString("siddhiAppName");
+    }
+
+    public void addConfigToSiddhiAppConfigs(String siddhiAppName, String simulationName) {
+        siddhiAppSimulationConfigs.computeIfAbsent(siddhiAppName, k -> new ArrayList<>())
+                .add(simulationName);
+    }
+
+    public void activateSimulationConfig(String simulationName) throws CarbonDeploymentException, IOException {
+        if (this.activatedSimulationConfigs.contains(simulationName)) {
+            return;
+        }
+        Path path = SIMULATION_CONFIG_DIR.resolve(simulationName + ".json");
+        File configurationFile = new File(path.toUri());
+        if (configurationFile.isFile()) {
+            deploySimulationConfig(new JSONObject(readFile(configurationFile)));
+            this.simulationConfigDeployer.deploy(new Artifact(configurationFile));
+        }
+        this.activatedSimulationConfigs.add(simulationName);
+    }
+
+    public List<JSONObject> getSimulationConfigs(List<String> siddhiApps) throws IOException {
+        ArrayList<JSONObject> configs = new ArrayList<>();
+        for (String siddhiApp : siddhiApps) {
+            if (!this.siddhiAppSimulationConfigs.containsKey(siddhiApp)) {
+                continue;
+            }
+            List<String> configurationNames = this.siddhiAppSimulationConfigs.get(siddhiApp);
+            for (String configurationName : configurationNames) {
+                File configurationFile = new File(SIMULATION_CONFIG_DIR.resolve(configurationName + ".json").toUri());
+                if (configurationFile.isFile()) {
+                    configs.add(new JSONObject(readFile(configurationFile)));
+                }
+            }
+        }
+        return configs;
     }
 
     private void processSimulationConfigFile(File jsonFile) throws IOException {
@@ -84,55 +116,11 @@ public class LSEventSimulatorDataHolder {
                 .add(simulationName);
     }
 
-    private  String readFile(File file) throws IOException {
+    private String readFile(File file) throws IOException {
         return String.join(System.lineSeparator(), Files.readAllLines(file.toPath(), StandardCharsets.UTF_8));
     }
 
-    public static String getSiddhiAppName(JSONArray sourcesArray) {
-        JSONObject sourceObject = sourcesArray.getJSONObject(0);
-        return sourceObject.getString("siddhiAppName");
-    }
-
-    public void addConfigToSiddhiAppConfigs(String siddhiAppName, String simulationName) {
-        siddhiAppSimulationConfigs.computeIfAbsent(siddhiAppName, k -> new ArrayList<>())
-                .add(simulationName);
-    }
-
-    public void activateSimulationConfigs(List<String> siddhiApps) throws CarbonDeploymentException, IOException {
-        for (String siddhiApp: siddhiApps) {
-            if (this.simulationActivatedSiddhiApps.contains(siddhiApp) || !this.siddhiAppSimulationConfigs.containsKey(siddhiApp)) {
-                continue;
-            }
-            List<String> configurationNames = this.siddhiAppSimulationConfigs.get(siddhiApp);
-            for (String configurationName: configurationNames) {
-                File configurationFile = new File(getSimulationConfigDirectory().resolve(configurationName + ".json").toUri());
-                if (configurationFile.isFile()) {
-                    deploySimulationConfig(new JSONObject(readFile(configurationFile)));
-                    this.simulationConfigDeployer.deploy(new Artifact(configurationFile));
-                }
-            }
-            this.simulationActivatedSiddhiApps.add(siddhiApp);
-        }
-    }
-
-    public List<JSONObject> getSimulationConfigs(List<String> siddhiApps) throws IOException {
-        ArrayList<JSONObject> configs = new ArrayList<>();
-        for (String siddhiApp: siddhiApps) {
-            if (!this.siddhiAppSimulationConfigs.containsKey(siddhiApp)) {
-                continue;
-            }
-            List<String> configurationNames = this.siddhiAppSimulationConfigs.get(siddhiApp);
-            for (String configurationName: configurationNames) {
-                File configurationFile = new File(getSimulationConfigDirectory().resolve(configurationName + ".json").toUri());
-                if (configurationFile.isFile()) {
-                    configs.add(new JSONObject(readFile(configurationFile)));
-                }
-            }
-        }
-        return configs;
-    }
-
-    public void deploySimulationConfig(JSONObject simulationConfiguration) throws CarbonDeploymentException {
+    private void deploySimulationConfig(JSONObject simulationConfiguration) throws CarbonDeploymentException {
         JSONArray sourcesArray = simulationConfiguration.getJSONArray("sources");
         for (int i = 0; i < sourcesArray.length(); i++) {
             JSONObject sourceObject = sourcesArray.getJSONObject(i);

@@ -45,8 +45,9 @@ public class EventSimulatorService extends ExtensionService {
 
     public EventSimulatorService() {
         try {
-            LSEventSimulatorDataHolder.INSTANCE.initialize(new LSEventStreamService());
-        } catch (CarbonDeploymentException | IOException e) {
+            LSEventSimulatorDataHolder.INSTANCE.initializeEventSimulatorDataHolder(new LSEventStreamService());
+            LSEventSimulatorDataHolder.INSTANCE.loadSimulationConfigurations();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

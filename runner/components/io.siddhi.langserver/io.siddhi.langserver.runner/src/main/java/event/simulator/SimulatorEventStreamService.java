@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LSEventStreamService implements EventStreamService {
-    private static final Logger log = LoggerFactory.getLogger(LSEventStreamService.class);
+public class SimulatorEventStreamService implements EventStreamService {
+    private static final Logger log = LoggerFactory.getLogger(SimulatorEventStreamService.class);
     private final SiddhiAppRuntime siddhiAppRuntime;
 
-    public LSEventStreamService(SiddhiAppRuntime siddhiAppRuntime) {
+    public SimulatorEventStreamService(SiddhiAppRuntime siddhiAppRuntime) {
         this.siddhiAppRuntime = siddhiAppRuntime;
     }
 
