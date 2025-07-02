@@ -13,7 +13,6 @@ import io.siddhi.query.api.definition.StreamDefinition;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.json.JSONObject;
-import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.api.*;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
@@ -111,7 +110,7 @@ public class EventSimulatorService extends ExtensionService {
                 List<JSONObject> activeSimulations = LSEventSimulatorDataHolder.INSTANCE.getSimulationConfigs(simulationsGetRequest.getSiddhiApps());
                 JSONObject response = new JSONObject();
                 response.put("activeSimulations", activeSimulations);
-                response.put("inactiveSimulations", Collections.emptyList());
+                response.put("inActiveSimulations", Collections.emptyList());
                 return new SimulationConfigResponse(response.toString(), new SimulatorResponse(true, ""));
             } catch (IOException e) {
                 return new SimulationConfigResponse(null, new SimulatorResponse(false, e.getMessage()));
