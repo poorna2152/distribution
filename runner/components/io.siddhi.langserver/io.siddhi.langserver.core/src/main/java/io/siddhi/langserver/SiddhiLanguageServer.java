@@ -15,16 +15,7 @@
  */
 package io.siddhi.langserver;
 
-import com.google.gson.JsonParser;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.langserver.extension.DesignModelGeneratorService;
-import io.siddhi.langserver.extension.EventSimulatorService;
-import io.siddhi.langserver.extension.ExportService;
-import io.siddhi.langserver.extension.RuntimeService;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
-import org.apache.logging.log4j.core.config.xml.XmlConfiguration;
+import io.siddhi.langserver.extension.*;
 import org.eclipse.lsp4j.CompletionOptions;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
@@ -38,19 +29,12 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.siddhi.editor.core.internal.DebugProcessorService;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
-import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.Level;
 
 /**
  * Siddhi Language Server implementation for Siddhi which  provides language analytic capabilities for Siddhi
@@ -64,7 +48,7 @@ public class SiddhiLanguageServer implements LanguageServer, Endpoint, JsonRpcMe
     private int shutDownStatus = 1;
     private final DesignModelGeneratorService designModelGeneratorService;
     private final EventSimulatorService eventSimulatorService;
-    private final RuntimeService runtimeService;
+    private final SiddhiExtensionInstallerService siddhiExtensionInstallerService;
     private final ExportService exportService;
     private Map<String, JsonRpcMethod> supportedMethods;
     private final Map<String, Endpoint> extensionServices = new HashMap<>();
@@ -76,7 +60,7 @@ public class SiddhiLanguageServer implements LanguageServer, Endpoint, JsonRpcMe
         this.workspaceService = new SiddhiWorkspaceService();
         this.designModelGeneratorService = new DesignModelGeneratorService();
         this.eventSimulatorService = new EventSimulatorService();
-        this.runtimeService = new RuntimeService();
+        this.siddhiExtensionInstallerService = new SiddhiExtensionInstallerService();
         this.exportService = new ExportService();
 
     }
@@ -156,8 +140,8 @@ public class SiddhiLanguageServer implements LanguageServer, Endpoint, JsonRpcMe
                 this.extensionServices.put(entry.getKey(), eventSimulatorEndpoint);
                 supportedMethods.put(entry.getKey(), entry.getValue());
             }
-            supportedExtensions = runtimeService.supportedMethods();
-            Endpoint runtimeEndpoint = ServiceEndpoints.toEndpoint(runtimeService);
+            supportedExtensions = siddhiExtensionInstallerService.supportedMethods();
+            Endpoint runtimeEndpoint = ServiceEndpoints.toEndpoint(siddhiExtensionInstallerService);
             for (Map.Entry<String, JsonRpcMethod> entry : supportedExtensions.entrySet()) {
                 this.extensionServices.put(entry.getKey(), runtimeEndpoint);
                 supportedMethods.put(entry.getKey(), entry.getValue());

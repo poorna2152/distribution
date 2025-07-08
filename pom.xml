@@ -1384,6 +1384,11 @@
                 <artifactId>org.wso2.carbon.event.simulator.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.extensions.installer.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

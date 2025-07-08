@@ -83,30 +83,4 @@ public class ExportService extends ExtensionService {
             return new ExportResponse(errorMessage.isEmpty(), errorMessage);
         });
     }
-
-//    @JsonRequest
-//    public CompletableFuture<ExportResponse> exportKubernetes(ExportAppsRequest exportAppsRequest) {
-//        return CompletableFuture.supplyAsync(() -> {
-//            String errorMessage = "";
-//            try {
-//                ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, EXPORT_TYPE_KUBERNETES);
-//                File zipFile = exportUtils.createZipFile();
-//                String fileName = exportUtils.getZipFileName();
-//                return Response
-//                        .status(Response.Status.OK)
-//                        .entity(zipFile)
-//                        .header("Content-Disposition", ("attachment; filename=" + fileName))
-//                        .build();
-//            } catch (JsonSyntaxException e) {
-//                errorMessage = "Incorrect JSON configuration format found while exporting Docker/K8s" + e.getMessage();
-//            } catch (DockerGenerationException e) {
-//                errorMessage = "Exception caught while generating Docker export artifacts. " + e.getMessage();
-//            } catch (KubernetesGenerationException e) {
-//                errorMessage = "Exception caught while generating Kubernetes export artifacts. " + e.getMessage();
-//            } catch (Exception e) {
-//                errorMessage = "Cannot generate export-artifacts archive. " + e.getMessage();
-//            }
-//            return new ExportResponse(errorMessage);
-//        });
-//    }
 }
